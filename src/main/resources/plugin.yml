@@ -1,0 +1,9 @@
+name: DarknessExample
+version: '${version}'
+main: ac.darkness.darknessac.DarknessExample
+depend:
+  - Darkness
+  - packetevents
+softdepend:
+  - PacketEvents
+folia-supported: true
