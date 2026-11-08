@@ -2,26 +2,38 @@ package ac.darkness.darknessac;
 
 import ac.darkness.darknessac.animation.InfernoMode;
 import ac.darkness.darknessac.api.DarknessAPI;
-import ac.darkness.darknessac.api.punishment.AnimationMode;
+import ac.darkness.darknessac.command.DarknessExampleCommand;
+import ac.darkness.darknessac.listener.DarknessListener;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class DarknessExample extends JavaPlugin {
 
     public static final String ANIMATION_NAME = "INFERNO";
 
-    private AnimationMode infernoAnimation;
-
     @Override
     public void onEnable() {
-        this.infernoAnimation = new InfernoMode();
-        DarknessAPI.registerAnimation(ANIMATION_NAME, infernoAnimation);
-        getLogger().info("Successfully registered " + ANIMATION_NAME + " animation in DarknessAPI!");
+        if (!DarknessAPI.isInitialized()) {
+            getLogger().severe("Darkness API is not initialized! Disabling plugin.");
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
+        DarknessAPI.registerAnimation(ANIMATION_NAME, new InfernoMode());
+        getServer().getPluginManager().registerEvents(new DarknessListener(this), this);
+
+        PluginCommand cmd = getCommand("darknessexample");
+        if (cmd != null) {
+            DarknessExampleCommand executor = new DarknessExampleCommand();
+            cmd.setExecutor(executor);
+            cmd.setTabCompleter(executor);
+        }
+
+        getLogger().info("DarknessExample enabled successfully (Darkness v" + DarknessAPI.get().getDarknessVersion() + ")");
     }
 
     @Override
     public void onDisable() {
-        if (infernoAnimation != null) {
-            DarknessAPI.unregisterAnimation(ANIMATION_NAME);
-        }
+        DarknessAPI.unregisterAnimation(ANIMATION_NAME);
     }
 }
