@@ -11,6 +11,7 @@ Official example Paper/Purpur/Folia plugin demonstrating full integration with [
 
 ### 2. Bukkit Event Handling (`DarknessListener`)
 - **`DarknessViolationEvent`**: Intercepts check flags, prints detailed telemetry (check, subtype, VL, verbose), and demonstrates canceling false positives in designated arena worlds.
+- **`DarknessSetbackEvent`**: Intercepts setback rollback actions, demonstrating how to cancel rollback teleports in minigame/parkour worlds while keeping violation logs intact.
 - **`DarknessPunishEvent`**: Intercepts punishment commands before execution, allowing inspection or modification of punishment reasons.
 - **`DarknessPunishWaveEvent`**: Listens for batch ban-waves and processes the collection of queued player UUIDs.
 

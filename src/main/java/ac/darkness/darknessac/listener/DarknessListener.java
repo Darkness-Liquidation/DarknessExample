@@ -2,6 +2,7 @@ package ac.darkness.darknessac.listener;
 
 import ac.darkness.darknessac.api.events.DarknessPunishEvent;
 import ac.darkness.darknessac.api.events.DarknessPunishWaveEvent;
+import ac.darkness.darknessac.api.events.DarknessSetbackEvent;
 import ac.darkness.darknessac.api.events.DarknessViolationEvent;
 import ac.darkness.darknessac.command.DarknessExampleCommand;
 import org.bukkit.Bukkit;
@@ -40,6 +41,20 @@ public final class DarknessListener implements Listener {
                     staff.sendMessage(alert);
                 }
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onSetback(DarknessSetbackEvent event) {
+        Player player = event.getPlayer();
+        if (EXEMPT_WORLD.equalsIgnoreCase(player.getWorld().getName())) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // Example: cancel setback in parkour / minigame worlds so player isn't rolled back
+        if ("parkour".equalsIgnoreCase(player.getWorld().getName())) {
+            event.setCancelled(true);
         }
     }
 
