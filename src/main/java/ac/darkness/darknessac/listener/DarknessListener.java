@@ -1,8 +1,10 @@
 package ac.darkness.darknessac.listener;
 
+import ac.darkness.darknessac.api.TrustLevel;
 import ac.darkness.darknessac.api.events.DarknessPunishEvent;
 import ac.darkness.darknessac.api.events.DarknessPunishWaveEvent;
 import ac.darkness.darknessac.api.events.DarknessSetbackEvent;
+import ac.darkness.darknessac.api.events.DarknessTrustChangeEvent;
 import ac.darkness.darknessac.api.events.DarknessViolationEvent;
 import ac.darkness.darknessac.command.DarknessExampleCommand;
 import org.bukkit.Bukkit;
@@ -76,5 +78,18 @@ public final class DarknessListener implements Listener {
         int queued = event.getPlayerUUIDs().size();
         Bukkit.broadcastMessage(DarknessExampleCommand.color(DarknessExampleCommand.PREFIX + " &c" + queued
                 + " &fplayers were punished in ban wave!"));
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onTrustChange(DarknessTrustChangeEvent event) {
+        if (event.getNewLevel() == TrustLevel.RED) {
+            String alert = DarknessExampleCommand.color(DarknessExampleCommand.PREFIX + " &cStaff Alert: &f"
+                    + event.getUsername() + " &7trust factor dropped to &cRED &8(&7" + event.getTrustScore() + "%&8)");
+            for (Player staff : Bukkit.getOnlinePlayers()) {
+                if (staff.hasPermission("darknessexample.staff")) {
+                    staff.sendMessage(alert);
+                }
+            }
+        }
     }
 }

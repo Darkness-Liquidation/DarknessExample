@@ -14,6 +14,7 @@ Official example Paper/Purpur/Folia plugin demonstrating full integration with [
 - **`DarknessSetbackEvent`**: Intercepts setback rollback actions, demonstrating how to cancel rollback teleports in minigame/parkour worlds while keeping violation logs intact.
 - **`DarknessPunishEvent`**: Intercepts punishment commands before execution, allowing inspection or modification of punishment reasons.
 - **`DarknessPunishWaveEvent`**: Listens for batch ban-waves and processes the collection of queued player UUIDs.
+- **`DarknessTrustChangeEvent`**: Listens for real-time changes in player trust factor (e.g. degrading to RED) to immediately notify online staff.
 
 ### 3. API & Player Management (`DarknessExampleCommand`)
 Provides the `/darknessexample` (or `/dexample`) administrative command:
