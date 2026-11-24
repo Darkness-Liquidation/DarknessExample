@@ -53,7 +53,7 @@ public final class DarknessListener implements Listener {
         }
 
         Bukkit.broadcastMessage(DarknessExampleCommand.color(DarknessExampleCommand.PREFIX + " &cPlayer &6&l"
-                + player.getName() + "&r &cwas removed by anticheat for cheating!"));
+                + player.getName() + "&r &cwas removed by Darkness Liquidation for cheating!"));
     }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)

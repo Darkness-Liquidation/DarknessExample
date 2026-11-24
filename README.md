@@ -28,7 +28,7 @@ Provides the `/darknessexample` (or `/dexample`) administrative command:
 
 - Java 21 toolchain (runs on Java 17+)
 - Paper / Purpur / Folia server (1.20.6+)
-- [Darkness Anticheat](https://github.com/Darkness-Liquidation)
+- [Darkness Liquidation](https://github.com/Darkness-Liquidation)
 - [PacketEvents](https://github.com/retrooper/packetevents)
 
 ---
