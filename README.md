@@ -19,8 +19,8 @@ Provides the `/darknessexample` (or `/dexample`) administrative command:
 - `/dexample bypass <player> [seconds]` — Grants temporary check immunity via `DarknessUser#setTempBypass(seconds)`.
 - `/dexample info <player>` — Displays aggregate violations, category violations, trust level, and active check data.
 - `/dexample flag <player> <check> [type]` — Triggers a manual check flag via `DarknessUser#flag(...)`.
-- `/dexample punish <player> [reason]` — Executes the anticheat punishment workflow via `DarknessUser#punish(...)` or `DarknessAPI.INSTANCE.punish(...)`.
-- `/dexample alert <message>` — Broadcasts a staff alert via `DarknessAPI.INSTANCE.getAlertManager().sendAlert(message)`.
+- `/dexample punish <player> [reason]` — Executes the anticheat punishment workflow via `DarknessAPI.getPunishmentManager().punish(...)` or `DarknessUser#punish(...)`.
+- `/dexample alert <message>` — Broadcasts a staff alert via `DarknessAPI.get().getAlertManager().sendAlert(message)`.
 
 ---
 

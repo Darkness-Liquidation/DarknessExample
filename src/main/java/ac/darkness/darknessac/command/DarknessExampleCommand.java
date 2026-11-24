@@ -1,5 +1,6 @@
 package ac.darkness.darknessac.command;
 
+import ac.darkness.darknessac.api.CheckCategory;
 import ac.darkness.darknessac.api.DarknessAPI;
 import ac.darkness.darknessac.api.DarknessUser;
 import ac.darkness.darknessac.api.custom.CheckData;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @SuppressWarnings("deprecation")
 public final class DarknessExampleCommand implements CommandExecutor, TabCompleter {
@@ -57,11 +59,12 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
                     sender.sendMessage(color(PREFIX + " &cPlayer not found!"));
                     return true;
                 }
-                DarknessUser user = DarknessAPI.getUser(target);
-                if (user == null) {
+                Optional<DarknessUser> userOpt = DarknessAPI.findUser(target);
+                if (userOpt.isEmpty()) {
                     sender.sendMessage(color(PREFIX + " &cDarkness user not found!"));
                     return true;
                 }
+                DarknessUser user = userOpt.get();
 
                 long seconds = 10;
                 if (args.length >= 3) {
@@ -74,10 +77,11 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
                 }
 
                 if (args.length >= 4) {
-                    String scope = args[3].toLowerCase();
-                    if (scope.equals("combat") || scope.equals("movement") || scope.equals("world")) {
-                        user.setCategoryTempBypass(scope, seconds);
-                        sender.sendMessage(color(PREFIX + " &fGranted &e" + scope + " &fbypass to &c" + target.getName() + " &ffor &c" + seconds + "s"));
+                    String scope = args[3];
+                    CheckCategory category = CheckCategory.fromString(scope);
+                    if (category != CheckCategory.OTHER) {
+                        user.setCategoryTempBypass(category, seconds);
+                        sender.sendMessage(color(PREFIX + " &fGranted &e" + category.displayName() + " &fbypass to &c" + target.getName() + " &ffor &c" + seconds + "s"));
                     } else {
                         user.setTempBypass(args[3], seconds);
                         sender.sendMessage(color(PREFIX + " &fGranted &e" + args[3] + " &fcheck bypass to &c" + target.getName() + " &ffor &c" + seconds + "s"));
@@ -98,11 +102,12 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
                     sender.sendMessage(color(PREFIX + " &cPlayer not found!"));
                     return true;
                 }
-                DarknessUser user = DarknessAPI.getUser(target);
-                if (user == null) {
+                Optional<DarknessUser> userOpt = DarknessAPI.findUser(target);
+                if (userOpt.isEmpty()) {
                     sender.sendMessage(color(PREFIX + " &cDarkness user not found!"));
                     return true;
                 }
+                DarknessUser user = userOpt.get();
 
                 sender.sendMessage(" ");
                 sender.sendMessage(color(PREFIX + " &7Player profile: &f" + target.getName()));
@@ -141,11 +146,12 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
                     sender.sendMessage(color(PREFIX + " &cPlayer not found!"));
                     return true;
                 }
-                DarknessUser user = DarknessAPI.getUser(target);
-                if (user == null) {
+                Optional<DarknessUser> userOpt = DarknessAPI.findUser(target);
+                if (userOpt.isEmpty()) {
                     sender.sendMessage(color(PREFIX + " &cDarkness user not found!"));
                     return true;
                 }
+                DarknessUser user = userOpt.get();
 
                 String check = args[2];
                 String type = "";
@@ -181,12 +187,7 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
                 }
 
                 String reason = args.length >= 3 ? String.join(" ", Arrays.copyOfRange(args, 2, args.length)) : "Cheating";
-                DarknessUser user = DarknessAPI.getUser(target);
-                if (user != null) {
-                    user.punish(reason);
-                } else {
-                    DarknessAPI.get().punish(target, reason);
-                }
+                DarknessAPI.getPunishmentManager().punish(target.getUniqueId(), reason);
                 sender.sendMessage(color(PREFIX + " &fPunished &c" + target.getName() + " &8(&7Reason: &f" + reason + "&8)"));
             }
             case "alert" -> {
@@ -227,7 +228,12 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
                 return completions;
             }
             if (args.length == 4) {
-                List<String> scopes = new ArrayList<>(Arrays.asList("combat", "movement", "world"));
+                List<String> scopes = new ArrayList<>();
+                for (CheckCategory cat : CheckCategory.values()) {
+                    if (cat != CheckCategory.OTHER) {
+                        scopes.add(cat.name().toLowerCase());
+                    }
+                }
                 DarknessUser user = resolveUser(args[1]);
                 if (user != null) {
                     for (CheckData cd : user.getCheckData()) {
@@ -274,12 +280,12 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
     private static DarknessUser resolveUser(String name) {
         Player p = Bukkit.getPlayer(name);
         if (p != null) {
-            DarknessUser u = DarknessAPI.getUser(p);
-            if (u != null) return u;
+            Optional<DarknessUser> u = DarknessAPI.findUser(p);
+            if (u.isPresent()) return u.get();
         }
         for (Player online : Bukkit.getOnlinePlayers()) {
-            DarknessUser u = DarknessAPI.getUser(online);
-            if (u != null) return u;
+            Optional<DarknessUser> u = DarknessAPI.findUser(online);
+            if (u.isPresent()) return u.get();
         }
         return null;
     }
