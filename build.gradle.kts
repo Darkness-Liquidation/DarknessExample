@@ -9,7 +9,7 @@ version = "1.0"
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
     compileOnly("com.github.retrooper:packetevents-spigot:2.14.0")
-    compileOnly("com.github.Darkness-Liquidation:DarknessAPI:1.1.0")
+    compileOnly("com.github.Darkness-Liquidation:DarknessAPI:1.1.1")
 }
 
 java {

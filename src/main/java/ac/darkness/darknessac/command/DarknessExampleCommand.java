@@ -1,6 +1,7 @@
 package ac.darkness.darknessac.command;
 
 import ac.darkness.darknessac.api.CheckCategory;
+import ac.darkness.darknessac.api.CheckType;
 import ac.darkness.darknessac.api.DarknessAPI;
 import ac.darkness.darknessac.api.DarknessUser;
 import ac.darkness.darknessac.api.custom.CheckData;
@@ -83,8 +84,13 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
                         user.setCategoryTempBypass(category, seconds);
                         sender.sendMessage(color(PREFIX + " &fGranted &e" + category.displayName() + " &fbypass to &c" + target.getName() + " &ffor &c" + seconds + "s"));
                     } else {
-                        user.setTempBypass(args[3], seconds);
-                        sender.sendMessage(color(PREFIX + " &fGranted &e" + args[3] + " &fcheck bypass to &c" + target.getName() + " &ffor &c" + seconds + "s"));
+                        CheckType checkType = CheckType.fromString(scope);
+                        if (checkType != CheckType.OTHER) {
+                            user.setTempBypass(checkType, seconds);
+                            sender.sendMessage(color(PREFIX + " &fGranted &e" + checkType.checkName() + " &fcheck bypass to &c" + target.getName() + " &ffor &c" + seconds + "s"));
+                        } else {
+                            sender.sendMessage(color(PREFIX + " &cUnknown category or check type: " + scope));
+                        }
                     }
                     return true;
                 }
@@ -234,12 +240,9 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
                         scopes.add(cat.name().toLowerCase());
                     }
                 }
-                DarknessUser user = resolveUser(args[1]);
-                if (user != null) {
-                    for (CheckData cd : user.getCheckData()) {
-                        if (!scopes.contains(cd.getCheck())) {
-                            scopes.add(cd.getCheck());
-                        }
+                for (CheckType ct : CheckType.values()) {
+                    if (ct != CheckType.OTHER) {
+                        scopes.add(ct.name().toLowerCase());
                     }
                 }
                 StringUtil.copyPartialMatches(args[3], scopes, completions);
