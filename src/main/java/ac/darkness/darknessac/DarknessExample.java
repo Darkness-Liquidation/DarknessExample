@@ -20,7 +20,7 @@ public final class DarknessExample extends JavaPlugin {
         }
 
         DarknessAPI.registerAnimation(ANIMATION_NAME, new InfernoMode());
-        getServer().getPluginManager().registerEvents(new DarknessListener(this), this);
+        DarknessAPI.INSTANCE.getEventBus().registerAnnotatedListeners(this, new DarknessListener(this));
 
         PluginCommand cmd = getCommand("darknessexample");
         if (cmd != null) {
@@ -29,7 +29,7 @@ public final class DarknessExample extends JavaPlugin {
             cmd.setTabCompleter(executor);
         }
 
-        getLogger().info("DarknessExample enabled successfully (Darkness v" + DarknessAPI.get().getDarknessVersion() + ")");
+        getLogger().info("DarknessExample enabled successfully (Darkness v" + DarknessAPI.INSTANCE.getDarknessVersion() + ")");
     }
 
     @Override

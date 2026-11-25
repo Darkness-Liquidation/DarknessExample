@@ -1,21 +1,20 @@
 package ac.darkness.darknessac.listener;
 
 import ac.darkness.darknessac.api.TrustLevel;
+import ac.darkness.darknessac.api.event.DarknessEventHandler;
+import ac.darkness.darknessac.api.events.DarknessCommandExecuteEvent;
 import ac.darkness.darknessac.api.events.DarknessPunishEvent;
 import ac.darkness.darknessac.api.events.DarknessPunishWaveEvent;
+import ac.darkness.darknessac.api.events.DarknessReloadEvent;
 import ac.darkness.darknessac.api.events.DarknessSetbackEvent;
 import ac.darkness.darknessac.api.events.DarknessTrustChangeEvent;
 import ac.darkness.darknessac.api.events.DarknessViolationEvent;
 import ac.darkness.darknessac.command.DarknessExampleCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-@SuppressWarnings("deprecation")
-public final class DarknessListener implements Listener {
+public final class DarknessListener {
 
     private static final String EXEMPT_WORLD = "exempt_world";
 
@@ -25,16 +24,17 @@ public final class DarknessListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    @DarknessEventHandler(priority = 0, ignoreCancelled = true)
     public void onViolation(DarknessViolationEvent event) {
         Player player = event.getPlayer();
-        if (EXEMPT_WORLD.equalsIgnoreCase(player.getWorld().getName())) {
+        if (player != null && EXEMPT_WORLD.equalsIgnoreCase(player.getWorld().getName())) {
             event.setCancelled(true);
             return;
         }
 
         if (event.getViolations() >= 5.0) {
-            String alert = DarknessExampleCommand.color(DarknessExampleCommand.PREFIX + " &c" + player.getName()
+            String name = player != null ? player.getName() : event.getUser().getName();
+            String alert = DarknessExampleCommand.color(DarknessExampleCommand.PREFIX + " &c" + name
                     + " &7failed &c" + event.getFullCheckName()
                     + " &7(x&c" + (int) event.getViolations() + "&7) &c" + event.getVerbose());
 
@@ -46,41 +46,43 @@ public final class DarknessListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    @DarknessEventHandler(priority = 0, ignoreCancelled = true)
     public void onSetback(DarknessSetbackEvent event) {
         Player player = event.getPlayer();
-        if (EXEMPT_WORLD.equalsIgnoreCase(player.getWorld().getName())) {
+        if (player != null && EXEMPT_WORLD.equalsIgnoreCase(player.getWorld().getName())) {
             event.setCancelled(true);
             return;
         }
 
         // Example: cancel setback in parkour / minigame worlds so player isn't rolled back
-        if ("parkour".equalsIgnoreCase(player.getWorld().getName())) {
+        if (player != null && "parkour".equalsIgnoreCase(player.getWorld().getName())) {
             event.setCancelled(true);
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    @DarknessEventHandler(priority = 100, ignoreCancelled = true)
     public void onPunish(DarknessPunishEvent event) {
         Player player = event.getPlayer();
-        if (player.hasPermission("darkness.bypass.punish")) {
+        if (player != null && player.hasPermission("darkness.bypass.punish")) {
             event.setCancelled(true);
             plugin.getLogger().warning("Cancelled punishment for staff member: " + player.getName());
             return;
         }
 
+        String name = player != null ? player.getName() : event.getUser().getName();
         Bukkit.broadcastMessage(DarknessExampleCommand.color(DarknessExampleCommand.PREFIX + " &cPlayer &6&l"
-                + player.getName() + "&r &cwas removed by Darkness Liquidation for cheating!"));
+                + name + "&r &cwas removed by Darkness Liquidation for cheating!"));
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    @DarknessEventHandler(priority = 0, ignoreCancelled = true)
     public void onPunishWave(DarknessPunishWaveEvent event) {
         int queued = event.getPlayerUUIDs().size();
+        int online = event.getOnlinePlayers().size();
         Bukkit.broadcastMessage(DarknessExampleCommand.color(DarknessExampleCommand.PREFIX + " &c" + queued
-                + " &fplayers were punished in ban wave!"));
+                + " &fplayers queued (" + online + " online) in ban wave!"));
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @DarknessEventHandler
     public void onTrustChange(DarknessTrustChangeEvent event) {
         if (event.getNewLevel() == TrustLevel.RED) {
             String alert = DarknessExampleCommand.color(DarknessExampleCommand.PREFIX + " &cStaff Alert: &f"
@@ -91,5 +93,18 @@ public final class DarknessListener implements Listener {
                 }
             }
         }
+    }
+
+    @DarknessEventHandler
+    public void onCommandExecute(DarknessCommandExecuteEvent event) {
+        if (event.getCommand().startsWith("say ")) {
+            plugin.getLogger().info("Intercepted Darkness command: " + event.getCommand());
+        }
+    }
+
+    @DarknessEventHandler
+    public void onReload(DarknessReloadEvent event) {
+        plugin.getLogger().info("Darkness reloaded (success=" + event.isSuccess()
+                + ", took=" + event.getDurationMillis() + "ms)");
     }
 }

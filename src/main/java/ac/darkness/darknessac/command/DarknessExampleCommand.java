@@ -89,7 +89,8 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
                             user.setTempBypass(checkType, seconds);
                             sender.sendMessage(color(PREFIX + " &fGranted &e" + checkType.checkName() + " &fcheck bypass to &c" + target.getName() + " &ffor &c" + seconds + "s"));
                         } else {
-                            sender.sendMessage(color(PREFIX + " &cUnknown category or check type: " + scope));
+                            user.setTempBypass(scope, seconds);
+                            sender.sendMessage(color(PREFIX + " &fGranted &e" + scope + " &fcheck bypass to &c" + target.getName() + " &ffor &c" + seconds + "s"));
                         }
                     }
                     return true;
@@ -202,7 +203,7 @@ public final class DarknessExampleCommand implements CommandExecutor, TabComplet
                     return true;
                 }
                 String message = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-                DarknessAPI.get().getAlertManager().sendAlert(message);
+                DarknessAPI.INSTANCE.getAlertManager().sendAlert(message);
                 sender.sendMessage(color(PREFIX + " &fAlert sent to staff"));
             }
             default -> sender.sendMessage(color(PREFIX + " &cUnknown subcommand! Use &f/" + label + " help"));

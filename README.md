@@ -9,20 +9,23 @@ Official example Paper/Purpur/Folia plugin demonstrating full integration with [
 - Sends levitation packets and displays converging flame/smoke rings around the target using PacketEvents.
 - Automatically registered via `DarknessAPI.registerAnimation("INFERNO", animation)` and unregistered on plugin disable.
 
-### 2. Bukkit Event Handling (`DarknessListener`)
+### 2. EventBus Event Handling (`DarknessListener`)
+- Registered via `DarknessAPI.INSTANCE.getEventBus().registerAnnotatedListeners(this, new DarknessListener(this))` with `@DarknessEventHandler`.
 - **`DarknessViolationEvent`**: Intercepts check flags, prints detailed telemetry (check, subtype, VL, verbose), and demonstrates canceling false positives in designated arena worlds.
 - **`DarknessSetbackEvent`**: Intercepts setback rollback actions, demonstrating how to cancel rollback teleports in minigame/parkour worlds while keeping violation logs intact.
-- **`DarknessPunishEvent`**: Intercepts punishment commands before execution, allowing inspection or modification of punishment reasons.
-- **`DarknessPunishWaveEvent`**: Listens for batch ban-waves and processes the collection of queued player UUIDs.
+- **`DarknessPunishEvent`**: Intercepts punishment commands before execution, allowing inspection or cancellation for immune staff.
+- **`DarknessPunishWaveEvent`**: Listens for batch ban-waves, providing both queued player UUIDs (`getPlayerUUIDs()`) and currently online players (`getOnlinePlayers()`).
 - **`DarknessTrustChangeEvent`**: Listens for real-time changes in player trust factor (e.g. degrading to RED) to immediately notify online staff.
+- **`DarknessCommandExecuteEvent`**: Intercepts anticheat command executions, allowing command modification or cancellation.
+- **`DarknessReloadEvent`**: Listens for configuration reload completions with success status and duration (`getDurationMillis()`).
 
 ### 3. API & Player Management (`DarknessExampleCommand`)
 Provides the `/darknessexample` (or `/dexample`) administrative command:
-- `/dexample bypass <player> [seconds]` — Grants temporary check immunity via `DarknessUser#setTempBypass(seconds)`.
+- `/dexample bypass <player> [seconds] [category/check]` — Grants temporary check immunity globally, per-category (`movement`), per-check-type (`speed`), or for a specific individual check (`SpeedA`) via `BypassManager` or `DarknessUser`.
 - `/dexample info <player>` — Displays aggregate violations, category violations, trust level, and active check data.
 - `/dexample flag <player> <check> [type]` — Triggers a manual check flag via `DarknessUser#flag(...)`.
 - `/dexample punish <player> [reason]` — Executes the anticheat punishment workflow via `DarknessAPI.getPunishmentManager().punish(...)` or `DarknessUser#punish(...)`.
-- `/dexample alert <message>` — Broadcasts a staff alert via `DarknessAPI.get().getAlertManager().sendAlert(message)`.
+- `/dexample alert <message>` — Broadcasts a staff alert via `DarknessAPI.INSTANCE.getAlertManager().sendAlert(message)`.
 
 ---
 
